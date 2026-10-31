@@ -61,7 +61,7 @@ class ActivityRegisterTest {
    * @return a new valid activity
    */
   private Activity createActivity(Person logger, LocalDateTime registeredAt) {
-    return new Activity(logger, "Tur til Besseggen", "Klassisk ryggtrase.", registeredAt);
+    return new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Tur til Besseggen", "Klassisk ryggtrase.", registeredAt);
   }
 
   @Nested
@@ -132,9 +132,9 @@ class ActivityRegisterTest {
     @Test
     @DisplayName("Search by word matches title or description, ignoring case")
     void searchByWordMatchesTitleOrDescription() {
-      Activity besseggen = new Activity(alex, "Tur til Besseggen",
+      Activity besseggen = new Activity(alex, Activity.TYPE_MOUNTAIN_HIKE, "Tur til Besseggen",
           "Klassisk ryggtrase.", LocalDateTime.of(2026, 10, 1, 8, 0));
-      Activity gaustatoppen = new Activity(nora, "Gaustatoppen",
+      Activity gaustatoppen = new Activity(nora, Activity.TYPE_SUMMIT_TRIP, "Gaustatoppen",
           "Tung tur med utsikt.", LocalDateTime.of(2026, 10, 2, 9, 0));
       register.addActivity(besseggen);
       register.addActivity(gaustatoppen);

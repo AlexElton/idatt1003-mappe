@@ -21,12 +21,14 @@ import org.junit.jupiter.api.Test;
  *   <li><b>Positive:</b> a valid activity is created with correct field
  *       values; title and description can be changed; sharing with a person
  *       and with a group makes the activity shared; {@code makePrivate()}
- *       clears sharing; getters return the stored values.</li>
+ *       clears sharing; getters return the stored values; the type is stored
+ *       case-insensitively and trimmed.</li>
  *   <li><b>Negative:</b> {@code null} logger, {@code null} registration time
  *       and blank title throw exceptions in the constructor; blank title is
  *       rejected by the setter; {@code null} description is rejected;
  *       sharing with {@code null} person/group throws; sharing the same
- *       person twice does not duplicate the entry.</li>
+ *       person twice does not duplicate the entry; an unknown or {@code null}
+ *       activity type is rejected.</li>
  * </ul>
  */
 class ActivityTest {
@@ -50,7 +52,7 @@ class ActivityTest {
     @Test
     @DisplayName("Creating an activity with valid data stores all field values")
     void creatingActivityWithValidDataStoresAllFields() {
-      Activity activity = new Activity(logger, "Tur til Besseggen",
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Tur til Besseggen",
           "Klassisk ryggtrase.", registeredAt);
 
       assertEquals(logger, activity.getLogger());
@@ -63,7 +65,7 @@ class ActivityTest {
     @Test
     @DisplayName("Title and description can be changed after creation")
     void titleAndDescriptionCanBeChanged() {
-      Activity activity = new Activity(logger, "Old title", "Old description", registeredAt);
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Old title", "Old description", registeredAt);
 
       activity.setTitle("New title");
       activity.setDescription("New description");
@@ -75,7 +77,7 @@ class ActivityTest {
     @Test
     @DisplayName("Sharing with a person makes the activity shared")
     void sharingWithPersonMakesActivityShared() {
-      Activity activity = new Activity(logger, "Title", "Description", registeredAt);
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Title", "Description", registeredAt);
       Person friend = new Person("Nora");
 
       activity.shareWith(friend);
@@ -87,7 +89,7 @@ class ActivityTest {
     @Test
     @DisplayName("Sharing with a group makes the activity shared")
     void sharingWithGroupMakesActivityShared() {
-      Activity activity = new Activity(logger, "Title", "Description", registeredAt);
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Title", "Description", registeredAt);
       Group group = new Group("Fjellgjengen");
 
       activity.shareWith(group);
@@ -99,7 +101,7 @@ class ActivityTest {
     @Test
     @DisplayName("makePrivate clears all sharing and marks the activity private")
     void makePrivateClearsSharing() {
-      Activity activity = new Activity(logger, "Title", "Description", registeredAt);
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Title", "Description", registeredAt);
       activity.shareWith(new Person("Nora"));
       activity.shareWith(new Group("Fjellgjengen"));
 
@@ -113,10 +115,39 @@ class ActivityTest {
     @Test
     @DisplayName("Title is trimmed when set")
     void titleIsTrimmed() {
-      Activity activity = new Activity(logger, "  Tur til Besseggen  ",
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "  Tur til Besseggen  ",
           "Description", registeredAt);
 
       assertEquals("Tur til Besseggen", activity.getTitle());
+    }
+
+    @Test
+    @DisplayName("A valid type is stored trimmed")
+    void validTypeIsStored() {
+      Activity activity = new Activity(logger, Activity.TYPE_GLACIER_HIKE,
+          "Title", "Description", registeredAt);
+
+      assertEquals(Activity.TYPE_GLACIER_HIKE, activity.getType());
+    }
+
+    @Test
+    @DisplayName("Type is matched case-insensitively and trimmed")
+    void typeIsCaseInsensitiveAndTrimmed() {
+      Activity activity = new Activity(logger, "  summit trip  ",
+          "Title", "Description", registeredAt);
+
+      assertEquals(Activity.TYPE_SUMMIT_TRIP, activity.getType());
+    }
+
+    @Test
+    @DisplayName("Type can be changed after creation")
+    void typeCanBeChanged() {
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE,
+          "Title", "Description", registeredAt);
+
+      activity.setType(Activity.TYPE_GLACIER_HIKE);
+
+      assertEquals(Activity.TYPE_GLACIER_HIKE, activity.getType());
     }
   }
 
@@ -128,34 +159,67 @@ class ActivityTest {
     @DisplayName("Creating an activity with null logger throws NullPointerException")
     void creatingActivityWithNullLoggerThrows() {
       assertThrows(NullPointerException.class,
-          () -> new Activity(null, "Title", "Description", registeredAt));
+          () -> new Activity(null, Activity.TYPE_MOUNTAIN_HIKE, "Title", "Description", registeredAt));
     }
 
     @Test
     @DisplayName("Creating an activity with null registration time throws NullPointerException")
     void creatingActivityWithNullTimeThrows() {
       assertThrows(NullPointerException.class,
-          () -> new Activity(logger, "Title", "Description", null));
+          () -> new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Title", "Description", null));
     }
 
     @Test
     @DisplayName("Creating an activity with blank title throws IllegalArgumentException")
     void creatingActivityWithBlankTitleThrows() {
       assertThrows(IllegalArgumentException.class,
-          () -> new Activity(logger, "   ", "Description", registeredAt));
+          () -> new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "   ", "Description", registeredAt));
     }
 
     @Test
     @DisplayName("Creating an activity with null title throws NullPointerException")
     void creatingActivityWithNullTitleThrows() {
       assertThrows(NullPointerException.class,
-          () -> new Activity(logger, null, "Description", registeredAt));
+          () -> new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, null,
+              "Description", registeredAt));
+    }
+
+    @Test
+    @DisplayName("Creating an activity with an unknown type throws IllegalArgumentException")
+    void creatingActivityWithUnknownTypeThrows() {
+      assertThrows(IllegalArgumentException.class,
+          () -> new Activity(logger, "Space walk", "Title", "Description", registeredAt));
+    }
+
+    @Test
+    @DisplayName("Creating an activity with null type throws NullPointerException")
+    void creatingActivityWithNullTypeThrows() {
+      assertThrows(NullPointerException.class,
+          () -> new Activity(logger, null, "Title", "Description", registeredAt));
+    }
+
+    @Test
+    @DisplayName("Setting an unknown type throws IllegalArgumentException")
+    void settingUnknownTypeThrows() {
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE,
+          "Title", "Description", registeredAt);
+
+      assertThrows(IllegalArgumentException.class, () -> activity.setType("Skiing"));
+    }
+
+    @Test
+    @DisplayName("Setting a null type throws NullPointerException")
+    void settingNullTypeThrows() {
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE,
+          "Title", "Description", registeredAt);
+
+      assertThrows(NullPointerException.class, () -> activity.setType(null));
     }
 
     @Test
     @DisplayName("Setting a blank title throws IllegalArgumentException")
     void settingBlankTitleThrows() {
-      Activity activity = new Activity(logger, "Title", "Description", registeredAt);
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Title", "Description", registeredAt);
 
       assertThrows(IllegalArgumentException.class, () -> activity.setTitle("  "));
     }
@@ -163,7 +227,7 @@ class ActivityTest {
     @Test
     @DisplayName("Setting a null description throws NullPointerException")
     void settingNullDescriptionThrows() {
-      Activity activity = new Activity(logger, "Title", "Description", registeredAt);
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Title", "Description", registeredAt);
 
       assertThrows(NullPointerException.class, () -> activity.setDescription(null));
     }
@@ -171,7 +235,7 @@ class ActivityTest {
     @Test
     @DisplayName("Sharing with null person throws NullPointerException")
     void sharingWithNullPersonThrows() {
-      Activity activity = new Activity(logger, "Title", "Description", registeredAt);
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Title", "Description", registeredAt);
 
       assertThrows(NullPointerException.class, () -> activity.shareWith((Person) null));
     }
@@ -179,7 +243,7 @@ class ActivityTest {
     @Test
     @DisplayName("Sharing with null group throws NullPointerException")
     void sharingWithNullGroupThrows() {
-      Activity activity = new Activity(logger, "Title", "Description", registeredAt);
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Title", "Description", registeredAt);
 
       assertThrows(NullPointerException.class, () -> activity.shareWith((Group) null));
     }
@@ -187,7 +251,7 @@ class ActivityTest {
     @Test
     @DisplayName("Sharing the same person twice does not duplicate the entry")
     void sharingSamePersonTwiceDoesNotDuplicate() {
-      Activity activity = new Activity(logger, "Title", "Description", registeredAt);
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Title", "Description", registeredAt);
       Person friend = new Person("Nora");
 
       activity.shareWith(friend);
@@ -199,7 +263,7 @@ class ActivityTest {
     @Test
     @DisplayName("The shared-with list cannot be modified from outside")
     void sharedWithListIsUnmodifiable() {
-      Activity activity = new Activity(logger, "Title", "Description", registeredAt);
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Title", "Description", registeredAt);
 
       assertThrows(UnsupportedOperationException.class,
           () -> activity.getSharedWith().add(new Person("Nora")));

@@ -9,8 +9,9 @@ import java.util.Objects;
 /**
  * Represents a single logged mountain hike (activity) in the trip register.
  *
- * <p>Responsibility: hold all information about one hike — who logged it, a title,
- * a description, when it was registered, and its sharing state. The class is
+ * <p>Responsibility: hold all information about one hike — who logged it, the type
+ * of the hike, a title, a description, when it was registered, and its sharing
+ * state. The class is
  * responsible for validating its own state: an {@code Activity} can never exist
  * in an invalid state, since all fields are validated in the constructor and in
  * every setter.</p>
@@ -25,8 +26,24 @@ import java.util.Objects;
  */
 public class Activity {
 
+  /** Activity type constant for a regular mountain hike. */
+  public static final String TYPE_MOUNTAIN_HIKE = "Mountain hike";
+
+  /** Activity type constant for a hike on a glacier. */
+  public static final String TYPE_GLACIER_HIKE = "Glacier hike";
+
+  /** Activity type constant for a trip with a summit as the goal. */
+  public static final String TYPE_SUMMIT_TRIP = "Summit trip";
+
+  /** All activity types allowed as the value of the type field. */
+  private static final String[] ALLOWED_TYPES =
+      {TYPE_MOUNTAIN_HIKE, TYPE_GLACIER_HIKE, TYPE_SUMMIT_TRIP};
+
   /** The person who logged this activity. Fixed after creation. */
   private Person logger;
+
+  /** The type of the hike, one of the TYPE_ constants of this class. */
+  private String type;
 
   /** Short title of the hike, e.g. "Tur til Preikestolen". */
   private String title;
@@ -53,20 +70,52 @@ public class Activity {
    * Creates a new, private activity.
    *
    * @param logger      the person who logged the activity; must not be {@code null}
+   * @param type        the type of the hike; must be one of the TYPE_ constants
    * @param title       a short title of the activity; must not be blank
    * @param description a longer description of the activity; must not be {@code null}
    * @param registeredAt the date and time the activity was registered; must not be {@code null}
    * @throws NullPointerException     if any argument is {@code null}
-   * @throws IllegalArgumentException if the title is blank
+   * @throws IllegalArgumentException if the title is blank or the type is not allowed
    */
-  public Activity(Person logger, String title, String description, LocalDateTime registeredAt) {
+  public Activity(Person logger, String type, String title, String description,
+      LocalDateTime registeredAt) {
     setLogger(logger);
+    setType(type);
     setTitle(title);
     setDescription(description);
     setRegisteredAt(registeredAt);
     this.isPrivate = true;
     this.sharedWith = new ArrayList<>();
     this.sharedWithGroups = new ArrayList<>();
+  }
+
+  /**
+   * Returns the type of this hike.
+   *
+   * @return the type of the hike, one of the TYPE_ constants of this class
+   */
+  public String getType() {
+    return type;
+  }
+
+  /**
+   * Sets the type of this hike.
+   *
+   * @param type the new type; must be one of the TYPE_ constants of this class
+   * @throws NullPointerException     if the type is {@code null}
+   * @throws IllegalArgumentException if the type is not an allowed activity type
+   */
+  public void setType(String type) {
+    Objects.requireNonNull(type, "Type must not be null");
+    String trimmed = type.trim();
+    for (String candidate : ALLOWED_TYPES) {
+      if (candidate.equalsIgnoreCase(trimmed)) {
+        this.type = candidate;
+        return;
+      }
+    }
+    throw new IllegalArgumentException(
+        "Type must be one of: " + String.join(", ", ALLOWED_TYPES));
   }
 
   /**
