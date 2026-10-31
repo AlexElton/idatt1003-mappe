@@ -22,13 +22,15 @@ import org.junit.jupiter.api.Test;
  *       values; title and description can be changed; sharing with a person
  *       and with a group makes the activity shared; {@code makePrivate()}
  *       clears sharing; getters return the stored values; the type is stored
- *       case-insensitively and trimmed.</li>
+ *       case-insensitively and trimmed; duration, distance and rating default
+ *       to 0 and can be set and read back.</li>
  *   <li><b>Negative:</b> {@code null} logger, {@code null} registration time
  *       and blank title throw exceptions in the constructor; blank title is
  *       rejected by the setter; {@code null} description is rejected;
  *       sharing with {@code null} person/group throws; sharing the same
  *       person twice does not duplicate the entry; an unknown or {@code null}
- *       activity type is rejected.</li>
+ *       activity type is rejected; non-positive duration, non-positive or
+ *       non-finite distance and out-of-range rating are rejected.</li>
  * </ul>
  */
 class ActivityTest {
@@ -149,6 +151,32 @@ class ActivityTest {
 
       assertEquals(Activity.TYPE_GLACIER_HIKE, activity.getType());
     }
+
+    @Test
+    @DisplayName("Duration, distance and rating default to zero when not registered")
+    void measurementsDefaultToZero() {
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE,
+          "Title", "Description", registeredAt);
+
+      assertEquals(0, activity.getDurationMinutes());
+      assertEquals(0.0, activity.getDistanceKm());
+      assertEquals(0, activity.getRating());
+    }
+
+    @Test
+    @DisplayName("Duration, distance and rating can be set and read back")
+    void measurementsCanBeSetAndRead() {
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE,
+          "Title", "Description", registeredAt);
+
+      activity.setDurationMinutes(180);
+      activity.setDistanceKm(14.5);
+      activity.setRating(4);
+
+      assertEquals(180, activity.getDurationMinutes());
+      assertEquals(14.5, activity.getDistanceKm());
+      assertEquals(4, activity.getRating());
+    }
   }
 
   @Nested
@@ -214,6 +242,48 @@ class ActivityTest {
           "Title", "Description", registeredAt);
 
       assertThrows(NullPointerException.class, () -> activity.setType(null));
+    }
+
+    @Test
+    @DisplayName("Setting a non-positive duration throws IllegalArgumentException")
+    void settingNonPositiveDurationThrows() {
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE,
+          "Title", "Description", registeredAt);
+
+      assertThrows(IllegalArgumentException.class, () -> activity.setDurationMinutes(0));
+      assertThrows(IllegalArgumentException.class, () -> activity.setDurationMinutes(-30));
+    }
+
+    @Test
+    @DisplayName("Setting a non-positive distance throws IllegalArgumentException")
+    void settingNonPositiveDistanceThrows() {
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE,
+          "Title", "Description", registeredAt);
+
+      assertThrows(IllegalArgumentException.class, () -> activity.setDistanceKm(0));
+      assertThrows(IllegalArgumentException.class, () -> activity.setDistanceKm(-5.5));
+    }
+
+    @Test
+    @DisplayName("Setting a non-finite distance throws IllegalArgumentException")
+    void settingNonFiniteDistanceThrows() {
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE,
+          "Title", "Description", registeredAt);
+
+      assertThrows(IllegalArgumentException.class, () -> activity.setDistanceKm(Double.NaN));
+      assertThrows(IllegalArgumentException.class,
+          () -> activity.setDistanceKm(Double.POSITIVE_INFINITY));
+    }
+
+    @Test
+    @DisplayName("Setting a rating outside 1 to 5 throws IllegalArgumentException")
+    void settingRatingOutOfRangeThrows() {
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE,
+          "Title", "Description", registeredAt);
+
+      assertThrows(IllegalArgumentException.class, () -> activity.setRating(0));
+      assertThrows(IllegalArgumentException.class, () -> activity.setRating(6));
+      assertThrows(IllegalArgumentException.class, () -> activity.setRating(-1));
     }
 
     @Test

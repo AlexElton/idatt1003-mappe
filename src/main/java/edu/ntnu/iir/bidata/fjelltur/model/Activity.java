@@ -10,8 +10,8 @@ import java.util.Objects;
  * Represents a single logged mountain hike (activity) in the trip register.
  *
  * <p>Responsibility: hold all information about one hike — who logged it, the type
- * of the hike, a title, a description, when it was registered, and its sharing
- * state. The class is
+ * of the hike, a title, a description, when it was registered, optional
+ * measurements (duration, distance, rating) and its sharing state. The class is
  * responsible for validating its own state: an {@code Activity} can never exist
  * in an invalid state, since all fields are validated in the constructor and in
  * every setter.</p>
@@ -44,6 +44,15 @@ public class Activity {
 
   /** The type of the hike, one of the TYPE_ constants of this class. */
   private String type;
+
+  /** Duration of the hike in minutes; 0 means not registered. */
+  private int durationMinutes;
+
+  /** Distance of the hike in kilometres; 0 means not registered. */
+  private double distanceKm;
+
+  /** Rating of the hike from 1 (worst) to 5 (best); 0 means not rated. */
+  private int rating;
 
   /** Short title of the hike, e.g. "Tur til Preikestolen". */
   private String title;
@@ -116,6 +125,72 @@ public class Activity {
     }
     throw new IllegalArgumentException(
         "Type must be one of: " + String.join(", ", ALLOWED_TYPES));
+  }
+
+  /**
+   * Returns the duration of this hike in minutes.
+   *
+   * @return the duration in minutes, or 0 if no duration is registered
+   */
+  public int getDurationMinutes() {
+    return durationMinutes;
+  }
+
+  /**
+   * Sets the duration of this hike in minutes.
+   *
+   * @param durationMinutes the duration in minutes; must be positive
+   * @throws IllegalArgumentException if the duration is not positive
+   */
+  public void setDurationMinutes(int durationMinutes) {
+    if (durationMinutes <= 0) {
+      throw new IllegalArgumentException("Duration must be positive");
+    }
+    this.durationMinutes = durationMinutes;
+  }
+
+  /**
+   * Returns the distance of this hike in kilometres.
+   *
+   * @return the distance in kilometres, or 0 if no distance is registered
+   */
+  public double getDistanceKm() {
+    return distanceKm;
+  }
+
+  /**
+   * Sets the distance of this hike in kilometres.
+   *
+   * @param distanceKm the distance in kilometres; must be positive
+   * @throws IllegalArgumentException if the distance is not positive
+   */
+  public void setDistanceKm(double distanceKm) {
+    if (distanceKm <= 0 || Double.isNaN(distanceKm) || Double.isInfinite(distanceKm)) {
+      throw new IllegalArgumentException("Distance must be a positive, finite number");
+    }
+    this.distanceKm = distanceKm;
+  }
+
+  /**
+   * Returns the rating of this hike.
+   *
+   * @return the rating from 1 to 5, or 0 if the hike is not rated
+   */
+  public int getRating() {
+    return rating;
+  }
+
+  /**
+   * Sets the rating of this hike.
+   *
+   * @param rating the rating; must be between 1 and 5 inclusive
+   * @throws IllegalArgumentException if the rating is outside 1 to 5
+   */
+  public void setRating(int rating) {
+    if (rating < 1 || rating > 5) {
+      throw new IllegalArgumentException("Rating must be between 1 and 5");
+    }
+    this.rating = rating;
   }
 
   /**
