@@ -73,7 +73,7 @@ public class UserInterface {
         "Klassisk ryggtrase over Besseggen ved Gjende.", LocalDateTime.of(2026, 9, 12, 9, 30));
     Activity gaustatoppen = new Activity(nora, "Gaustatoppen i solnedgang",
         "Kveldstur til Gaustatoppen, 1882 moh.", LocalDateTime.of(2026, 10, 3, 17, 0));
-    Activity storronden = new Activity(jonas, "Storronden runde",
+    final Activity storronden = new Activity(jonas, "Storronden runde",
         "Rundtur i Rondane med pause ved Rondvassbu.", LocalDateTime.of(2026, 10, 18, 10, 15));
     Activity morgenstund = new Activity(alex, "Morgenstund pa Vettakollen",
         "Kort morgenstur med utsikt over Oslofjorden.", LocalDateTime.of(2026, 10, 25, 7, 45));
