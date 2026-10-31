@@ -23,14 +23,16 @@ import org.junit.jupiter.api.Test;
  *       and with a group makes the activity shared; {@code makePrivate()}
  *       clears sharing; getters return the stored values; the type is stored
  *       case-insensitively and trimmed; duration, distance and rating default
- *       to 0 and can be set and read back.</li>
+ *       to 0 and can be set and read back; location defaults to an empty
+ *       string and is trimmed when set.</li>
  *   <li><b>Negative:</b> {@code null} logger, {@code null} registration time
  *       and blank title throw exceptions in the constructor; blank title is
  *       rejected by the setter; {@code null} description is rejected;
  *       sharing with {@code null} person/group throws; sharing the same
  *       person twice does not duplicate the entry; an unknown or {@code null}
  *       activity type is rejected; non-positive duration, non-positive or
- *       non-finite distance and out-of-range rating are rejected.</li>
+ *       non-finite distance, out-of-range rating and {@code null} or blank
+ *       location are rejected.</li>
  * </ul>
  */
 class ActivityTest {
@@ -177,6 +179,26 @@ class ActivityTest {
       assertEquals(14.5, activity.getDistanceKm());
       assertEquals(4, activity.getRating());
     }
+
+    @Test
+    @DisplayName("Location defaults to an empty string when not registered")
+    void locationDefaultsToEmptyString() {
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE,
+          "Title", "Description", registeredAt);
+
+      assertEquals("", activity.getLocation());
+    }
+
+    @Test
+    @DisplayName("Location can be set and is trimmed")
+    void locationCanBeSetAndIsTrimmed() {
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE,
+          "Title", "Description", registeredAt);
+
+      activity.setLocation("  Gjendesheim  ");
+
+      assertEquals("Gjendesheim", activity.getLocation());
+    }
   }
 
   @Nested
@@ -284,6 +306,24 @@ class ActivityTest {
       assertThrows(IllegalArgumentException.class, () -> activity.setRating(0));
       assertThrows(IllegalArgumentException.class, () -> activity.setRating(6));
       assertThrows(IllegalArgumentException.class, () -> activity.setRating(-1));
+    }
+
+    @Test
+    @DisplayName("Setting a null location throws NullPointerException")
+    void settingNullLocationThrows() {
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE,
+          "Title", "Description", registeredAt);
+
+      assertThrows(NullPointerException.class, () -> activity.setLocation(null));
+    }
+
+    @Test
+    @DisplayName("Setting a blank location throws IllegalArgumentException")
+    void settingBlankLocationThrows() {
+      Activity activity = new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE,
+          "Title", "Description", registeredAt);
+
+      assertThrows(IllegalArgumentException.class, () -> activity.setLocation("   "));
     }
 
     @Test

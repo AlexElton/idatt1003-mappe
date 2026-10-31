@@ -54,6 +54,9 @@ public class Activity {
   /** Rating of the hike from 1 (worst) to 5 (best); 0 means not rated. */
   private int rating;
 
+  /** Location or starting point of the hike, e.g. "Gjendesheim". */
+  private String location = "";
+
   /** Short title of the hike, e.g. "Tur til Preikestolen". */
   private String title;
 
@@ -191,6 +194,29 @@ public class Activity {
       throw new IllegalArgumentException("Rating must be between 1 and 5");
     }
     this.rating = rating;
+  }
+
+  /**
+   * Returns the location or starting point of this hike.
+   *
+   * @return the location, or an empty string if no location is registered
+   */
+  public String getLocation() {
+    return location;
+  }
+  /**
+   * Sets the location or starting point of this hike.
+   *
+   * @param location the location; must not be {@code null} or blank
+   * @throws NullPointerException     if the location is {@code null}
+   * @throws IllegalArgumentException if the location is blank
+   */
+  public void setLocation(String location) {
+    Objects.requireNonNull(location, "Location must not be null");
+    if (location.isBlank()) {
+      throw new IllegalArgumentException("Location must not be blank");
+    }
+    this.location = location.trim();
   }
 
   /**
