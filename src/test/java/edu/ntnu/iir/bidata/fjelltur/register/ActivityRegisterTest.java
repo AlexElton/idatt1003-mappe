@@ -62,7 +62,8 @@ class ActivityRegisterTest {
    * @return a new valid activity
    */
   private Activity createActivity(Person logger, LocalDateTime registeredAt) {
-    return new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Tur til Besseggen", "Klassisk ryggtrase.", registeredAt);
+    return new Activity(logger, Activity.TYPE_MOUNTAIN_HIKE, "Tur til Besseggen",
+        "Klassisk ryggtrase.", registeredAt);
   }
 
   @Nested
