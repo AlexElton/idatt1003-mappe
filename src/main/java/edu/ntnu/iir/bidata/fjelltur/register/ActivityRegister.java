@@ -181,6 +181,27 @@ public class ActivityRegister {
   }
 
   /**
+   * Finds all activities of a specific type, ignoring case.
+   *
+   * @param type the activity type to search for; must not be {@code null} or
+   *             blank
+   * @return an unmodifiable list of activities of that type, newest first
+   * @throws NullPointerException     if the type is {@code null}
+   * @throws IllegalArgumentException if the type is blank
+   */
+  public List<Activity> findActivitiesByType(String type) {
+    Objects.requireNonNull(type, "Type must not be null");
+    if (type.isBlank()) {
+      throw new IllegalArgumentException("Type must not be blank");
+    }
+    String needle = type.trim().toLowerCase();
+    return activities.stream()
+        .filter(activity -> activity.getType().equalsIgnoreCase(needle))
+        .sorted(Comparator.comparing(Activity::getRegisteredAt).reversed())
+        .collect(Collectors.toUnmodifiableList());
+  }
+
+  /**
    * Returns the number of activities in the register.
    *
    * @return the number of activities in the register

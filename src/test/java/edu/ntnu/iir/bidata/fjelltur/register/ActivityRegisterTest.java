@@ -25,12 +25,13 @@ import org.junit.jupiter.api.Test;
  *       returned sorted newest first; search by date, date range, logger and
  *       word return the correct activities; shared-activities search respects
  *       direct sharing and group membership; statistics count activities per
- *       logger; removal works.</li>
+ *       logger; removal works; search by type matches case-insensitively.</li>
  *   <li><b>Negative:</b> adding {@code null} throws; searching with
  *       {@code null} dates/logger/word throws; blank search word throws;
  *       from-date after to-date throws; searching an empty register returns an
  *       empty list; removing an activity not in the register returns
- *       {@code false}; returned lists cannot be modified from outside.</li>
+ *       {@code false}; returned lists cannot be modified from outside;
+ *       {@code null} or blank type throws.</li>
  * </ul>
  */
 class ActivityRegisterTest {
@@ -196,6 +197,21 @@ class ActivityRegisterTest {
       assertTrue(register.removeActivity(activity));
       assertEquals(0, register.getNumberOfActivities());
     }
+
+    @Test
+    @DisplayName("Search by type finds only activities of that type, ignoring case")
+    void searchByTypeFindsOnlyThatType() {
+      Activity hike = createActivity(alex, LocalDateTime.of(2026, 10, 1, 8, 0));
+      Activity glacier = new Activity(nora, Activity.TYPE_GLACIER_HIKE, "Bre-tur",
+          "Tur pa breen.", LocalDateTime.of(2026, 10, 2, 9, 0));
+      register.addActivity(hike);
+      register.addActivity(glacier);
+
+      List<Activity> result = register.findActivitiesByType("glacier hike");
+
+      assertEquals(1, result.size());
+      assertEquals(glacier, result.get(0));
+    }
   }
 
   @Nested
@@ -259,6 +275,18 @@ class ActivityRegisterTest {
     @DisplayName("Searching with blank word throws IllegalArgumentException")
     void searchingWithBlankWordThrows() {
       assertThrows(IllegalArgumentException.class, () -> register.findActivitiesByWord("   "));
+    }
+
+    @Test
+    @DisplayName("Searching with null type throws NullPointerException")
+    void searchingWithNullTypeThrows() {
+      assertThrows(NullPointerException.class, () -> register.findActivitiesByType(null));
+    }
+
+    @Test
+    @DisplayName("Searching with blank type throws IllegalArgumentException")
+    void searchingWithBlankTypeThrows() {
+      assertThrows(IllegalArgumentException.class, () -> register.findActivitiesByType("  "));
     }
 
     @Test
