@@ -1,0 +1,23 @@
+@startuml sequence-register-activity
+actor Logger
+participant "UserInterface" as UI
+participant "PersonRegister" as PR
+participant "ActivityRegister" as AR
+participant "Activity" as A
+
+Logger -> UI : choose "Register activity"
+UI -> PR : getAllPersonsSortedByName()
+PR --> UI : list of loggers
+UI --> Logger : show logger menu
+Logger -> UI : select logger (or create new)
+alt create new logger
+  UI -> PR : addPerson(new Person(name))
+end
+UI --> Logger : prompt for type, title, description, date, time
+Logger -> UI : enter activity details
+UI -> A : new Activity(logger, type, title, description, timeOfHike)
+UI -> A : setDurationMinutes() / setDistanceKm() / setRating() / setLocation()
+UI -> AR : addActivity(activity)
+AR --> UI : activity added
+UI --> Logger : show registered activity
+@enduml

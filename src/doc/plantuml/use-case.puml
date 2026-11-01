@@ -1,0 +1,49 @@
+@startuml use-case
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Logger (user)" as Logger
+
+rectangle "Fjellturregister" {
+  usecase "List all activities" as UC1
+  usecase "Register a new activity" as UC2
+  usecase "Search for activities" as UC3
+  usecase "Delete an activity" as UC4
+  usecase "Manage loggers" as UC5
+  usecase "Manage groups" as UC6
+  usecase "Share an activity" as UC7
+  usecase "Show statistics" as UC8
+  usecase "Choose existing logger\nor create a new one" as UC2a
+  usecase "Search by date" as UC3a
+  usecase "Search by date range" as UC3b
+  usecase "Search by logger" as UC3c
+  usecase "Search by word\nin title/description" as UC3d
+  usecase "Create a group" as UC6a
+  usecase "Add or remove\na group member" as UC6b
+  usecase "Share with a person" as UC7a
+  usecase "Share with a group" as UC7b
+  usecase "Make an activity private" as UC7c
+  usecase "Show activities shared\nwith a specific person" as UC7d
+}
+
+Logger --> UC1
+Logger --> UC2
+Logger --> UC3
+Logger --> UC4
+Logger --> UC5
+Logger --> UC6
+Logger --> UC7
+Logger --> UC8
+
+UC2 ..> UC2a : <<include>>
+UC3 ..> UC3a : <<extend>>
+UC3 ..> UC3b : <<extend>>
+UC3 ..> UC3c : <<extend>>
+UC3 ..> UC3d : <<extend>>
+UC6 ..> UC6a : <<extend>>
+UC6 ..> UC6b : <<extend>>
+UC7 ..> UC7a : <<extend>>
+UC7 ..> UC7b : <<extend>>
+UC7 ..> UC7c : <<extend>>
+UC7 ..> UC7d : <<extend>>
+@enduml

@@ -1,0 +1,144 @@
+@startuml class-diagram
+skinparam classAttributeIconSize 0
+
+package "edu.ntnu.iir.bidata.fjelltur" {
+  class App {
+    - App()
+    + {static} main(String[] args)
+  }
+}
+
+package "edu.ntnu.iir.bidata.fjelltur.ui" {
+  class UserInterface {
+    - {static} MENU_* : int
+    - scanner : Scanner
+    - activityRegister : ActivityRegister
+    - personRegister : PersonRegister
+    - groupRegister : GroupRegister
+    + init()
+    + start()
+    - registerActivity()
+    - listActivities()
+    - searchMenu()
+    - deleteActivity()
+    - loggersMenu()
+    - groupsMenu()
+    - sharingMenu()
+    - showStatistics()
+    - readInt(String prompt) : int
+    - readDate(String prompt) : LocalDate
+    - readTime(String prompt) : LocalTime
+    - readLine(String prompt) : String
+    - readNonBlankLine(String prompt) : String
+  }
+}
+
+package "edu.ntnu.iir.bidata.fjelltur.register" {
+  class ActivityRegister {
+    - activities : List<Activity>
+    + addActivity(Activity activity)
+    + removeActivity(Activity activity) : boolean
+    + getAllActivitiesSortedByDate() : List<Activity>
+    + findActivitiesOnDate(LocalDate date) : List<Activity>
+    + findActivitiesInDateRange(LocalDate from, LocalDate to) : List<Activity>
+    + findActivitiesByLogger(Person logger) : List<Activity>
+    + findActivitiesByWord(String word) : List<Activity>
+    + findActivitiesByType(String type) : List<Activity>
+    + findActivitiesSharedWith(Person person) : List<Activity>
+    + getActivityCountPerLogger() : Map<Person, Long>
+    + getNumberOfActivities() : int
+    + getLastAddedActivity() : Optional<Activity>
+  }
+
+  class PersonRegister {
+    - persons : List<Person>
+    + addPerson(Person person) : boolean
+    + hasPerson(Person person) : boolean
+    + findPersonByName(String name) : Optional<Person>
+    + getAllPersonsSortedByName() : List<Person>
+    + getNumberOfPersons() : int
+  }
+
+  class GroupRegister {
+    - groups : List<Group>
+    + addGroup(Group group) : boolean
+    + removeGroup(Group group) : boolean
+    + hasGroup(Group group) : boolean
+    + findGroupByName(String name) : Optional<Group>
+    + getAllGroups() : List<Group>
+    + getNumberOfGroups() : int
+  }
+}
+
+package "edu.ntnu.iir.bidata.fjelltur.model" {
+  class Activity {
+    - {static} TYPE_MOUNTAIN_HIKE : String
+    - {static} TYPE_GLACIER_HIKE : String
+    - {static} TYPE_SUMMIT_TRIP : String
+    - logger : Person
+    - type : String
+    - title : String
+    - description : String
+    - registeredAt : LocalDateTime
+    - durationMinutes : int
+    - distanceKm : double
+    - rating : int
+    - location : String
+    - isPrivate : boolean
+    - sharedWith : List<Person>
+    - sharedWithGroups : List<Group>
+    + Activity(Person logger, String type, String title, String description, LocalDateTime registeredAt)
+    + getType() : String
+    + setType(String type)
+    + getTitle() : String
+    + setTitle(String title)
+    + getDescription() : String
+    + setDescription(String description)
+    + getLogger() : Person
+    + getRegisteredAt() : LocalDateTime
+    + getDurationMinutes() : int
+    + setDurationMinutes(int minutes)
+    + getDistanceKm() : double
+    + setDistanceKm(double km)
+    + getRating() : int
+    + setRating(int rating)
+    + getLocation() : String
+    + setLocation(String location)
+    + isPrivate() : boolean
+    + shareWith(Person person)
+    + shareWith(Group group)
+    + makePrivate()
+    + getSharedWith() : List<Person>
+    + getSharedWithGroups() : List<Group>
+  }
+
+  class Person {
+    - name : String
+    + Person(String name)
+    + getName() : String
+  }
+
+  class Group {
+    - name : String
+    - members : Set<Person>
+    + Group(String name)
+    + getName() : String
+    + addMember(Person person) : boolean
+    + removeMember(Person person) : boolean
+    + hasMember(Person person) : boolean
+    + getMembers() : Set<Person>
+  }
+}
+
+App ..> UserInterface : uses
+UserInterface --> ActivityRegister : owns
+UserInterface --> PersonRegister : owns
+UserInterface --> GroupRegister : owns
+ActivityRegister "1" o-- "*" Activity
+PersonRegister "1" o-- "*" Person
+GroupRegister "1" o-- "*" Group
+Activity "*" --> "1" Person : logged by
+Activity "*" --> "*" Person : shared with
+Activity "*" --> "*" Group : shared with
+Group "1" o-- "*" Person : members
+@enduml
