@@ -39,6 +39,26 @@ public class Activity {
   private static final String[] ALLOWED_TYPES =
       {TYPE_MOUNTAIN_HIKE, TYPE_GLACIER_HIKE, TYPE_SUMMIT_TRIP};
 
+  /**
+   * Returns all allowed activity types.
+   *
+   * @return a list of the allowed activity type names
+   */
+  public static List<String> allowedTypes() {
+    return List.of(ALLOWED_TYPES);
+  }
+
+  /**
+   * Returns whether the given type is one of the allowed activity types,
+   * ignoring case.
+   *
+   * @param type the type to check
+   * @return {@code true} if the type is allowed
+   */
+  public static boolean isAllowedType(String type) {
+    return allowedTypes().stream().anyMatch(allowed -> allowed.equalsIgnoreCase(type.trim()));
+  }
+
   /** The person who logged this activity. Fixed after creation. */
   private Person logger;
 

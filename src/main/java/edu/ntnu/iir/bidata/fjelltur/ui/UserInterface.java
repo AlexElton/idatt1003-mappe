@@ -1,5 +1,6 @@
 package edu.ntnu.iir.bidata.fjelltur.ui;
 
+import edu.ntnu.iir.bidata.fjelltur.DemoDataSeeder;
 import edu.ntnu.iir.bidata.fjelltur.model.Activity;
 import edu.ntnu.iir.bidata.fjelltur.model.Group;
 import edu.ntnu.iir.bidata.fjelltur.model.Person;
@@ -8,11 +9,8 @@ import edu.ntnu.iir.bidata.fjelltur.register.GroupRegister;
 import edu.ntnu.iir.bidata.fjelltur.register.PersonRegister;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Scanner;
 
 /**
@@ -124,6 +122,9 @@ public class UserInterface {
   /** Reads user input from the standard input stream. */
   private Scanner scanner;
 
+  /** Reads and validates user input from the console. */
+  private InputReader input;
+
   /**
    * Initialises the application: creates the registers, the input reader and
    * fills them with demonstration data.
@@ -133,7 +134,8 @@ public class UserInterface {
     this.personRegister = new PersonRegister();
     this.groupRegister = new GroupRegister();
     this.scanner = new Scanner(System.in);
-    createDemoData();
+    this.input = new InputReader(scanner);
+    new DemoDataSeeder(activityRegister, personRegister, groupRegister).seed();
   }
 
   /**
@@ -148,7 +150,7 @@ public class UserInterface {
     boolean running = true;
     while (running) {
       printMainMenu();
-      int choice = readInt("> ");
+      int choice = input.readInt("> ");
       System.out.println();
       switch (choice) {
         case MENU_LIST_ACTIVITIES -> listActivities();
@@ -208,7 +210,7 @@ public class UserInterface {
     boolean back = false;
     while (!back) {
       printSearchMenu();
-      int choice = readInt("> ");
+      int choice = input.readInt("> ");
       System.out.println();
       switch (choice) {
         case SEARCH_BY_DATE -> searchByDate();
@@ -240,7 +242,7 @@ public class UserInterface {
    * Searches for activities registered on a date read from the user.
    */
   private void searchByDate() {
-    LocalDate date = readDate("Date (yyyy-MM-dd): ");
+    LocalDate date = input.readDate("Date (yyyy-MM-dd): ");
     printSearchResult(activityRegister.findActivitiesOnDate(date));
   }
 
@@ -248,8 +250,8 @@ public class UserInterface {
    * Searches for activities within a date range read from the user.
    */
   private void searchByDateRange() {
-    LocalDate fromDate = readDate("From date (yyyy-MM-dd): ");
-    LocalDate toDate = readDate("To date (yyyy-MM-dd): ");
+    LocalDate fromDate = input.readDate("From date (yyyy-MM-dd): ");
+    LocalDate toDate = input.readDate("To date (yyyy-MM-dd): ");
     try {
       printSearchResult(activityRegister.findActivitiesInDateRange(fromDate, toDate));
     } catch (IllegalArgumentException exception) {
@@ -273,7 +275,7 @@ public class UserInterface {
    * from the user.
    */
   private void searchByWord() {
-    String word = readNonBlankLine("Word to search for: ");
+    String word = input.readNonBlankLine("Word to search for: ");
     printSearchResult(activityRegister.findActivitiesByWord(word));
   }
 
@@ -281,8 +283,8 @@ public class UserInterface {
    * Searches for activities of a type read from the user.
    */
   private void searchByType() {
-    System.out.println("Available types: " + String.join(", ", allowedTypes()));
-    String type = readNonBlankLine("Type: ");
+    System.out.println("Available types: " + String.join(", ", Activity.allowedTypes()));
+    String type = input.readNonBlankLine("Type: ");
     try {
       printSearchResult(activityRegister.findActivitiesByType(type));
     } catch (IllegalArgumentException exception) {
@@ -297,7 +299,7 @@ public class UserInterface {
     boolean back = false;
     while (!back) {
       printLoggersMenu();
-      int choice = readInt("> ");
+      int choice = input.readInt("> ");
       System.out.println();
       switch (choice) {
         case LOGGERS_LIST -> listLoggers();
@@ -337,7 +339,7 @@ public class UserInterface {
    * reported and the logger is not added twice.
    */
   private void addLogger() {
-    String name = readNonBlankLine("Name of the new logger: ");
+    String name = input.readNonBlankLine("Name of the new logger: ");
     boolean added = personRegister.addPerson(new Person(name));
     if (added) {
       System.out.println("Logger \"" + name.trim() + "\" was added.");
@@ -354,7 +356,7 @@ public class UserInterface {
     boolean back = false;
     while (!back) {
       printGroupsMenu();
-      int choice = readInt("> ");
+      int choice = input.readInt("> ");
       System.out.println();
       switch (choice) {
         case GROUPS_LIST -> listGroups();
@@ -402,7 +404,7 @@ public class UserInterface {
    * reported and the group is not created twice.
    */
   private void createGroup() {
-    String name = readNonBlankLine("Name of the new group: ");
+    String name = input.readNonBlankLine("Name of the new group: ");
     boolean created = groupRegister.addGroup(new Group(name));
     if (created) {
       System.out.println("Group \"" + name.trim() + "\" was created.");
@@ -459,7 +461,7 @@ public class UserInterface {
     boolean back = false;
     while (!back) {
       printSharingMenu();
-      int choice = readInt("> ");
+      int choice = input.readInt("> ");
       System.out.println();
       switch (choice) {
         case SHARING_SHARE_WITH_PERSON -> shareActivityWithPerson();
@@ -590,17 +592,17 @@ public class UserInterface {
       return;
     }
 
-    System.out.println("Available types: " + String.join(", ", allowedTypes()));
-    String type = readNonBlankLine("Type: ");
-    if (!isAllowedType(type)) {
+    System.out.println("Available types: " + String.join(", ", Activity.allowedTypes()));
+    String type = input.readNonBlankLine("Type: ");
+    if (!Activity.isAllowedType(type)) {
       System.out.println("Error: \"" + type.trim() + "\" is not a valid activity type.");
       return;
     }
 
-    String title = readNonBlankLine("Title: ");
-    String description = readNonBlankLine("Description: ");
-    LocalDate date = readDate("Date of the hike (yyyy-MM-dd): ");
-    LocalDateTime timeOfHike = date.atTime(readTime("Time of the hike (HH:mm): "));
+    String title = input.readNonBlankLine("Title: ");
+    String description = input.readNonBlankLine("Description: ");
+    LocalDate date = input.readDate("Date of the hike (yyyy-MM-dd): ");
+    LocalDateTime timeOfHike = date.atTime(input.readTime("Time of the hike (HH:mm): "));
 
     Activity activity = new Activity(logger, type, title, description, timeOfHike);
     readOptionalMeasurements(activity);
@@ -619,7 +621,7 @@ public class UserInterface {
    * @param activity the activity to store the measurements on
    */
   private void readOptionalMeasurements(Activity activity) {
-    String durationInput = readLine("Duration in minutes (empty to skip): ");
+    String durationInput = input.readLine("Duration in minutes (empty to skip): ");
     if (!durationInput.isBlank()) {
       try {
         activity.setDurationMinutes(Integer.parseInt(durationInput.trim()));
@@ -628,7 +630,7 @@ public class UserInterface {
       }
     }
 
-    String distanceInput = readLine("Distance in km (empty to skip): ");
+    String distanceInput = input.readLine("Distance in km (empty to skip): ");
     if (!distanceInput.isBlank()) {
       try {
         activity.setDistanceKm(Double.parseDouble(distanceInput.trim()));
@@ -637,7 +639,7 @@ public class UserInterface {
       }
     }
 
-    String ratingInput = readLine("Rating 1-5 (empty to skip): ");
+    String ratingInput = input.readLine("Rating 1-5 (empty to skip): ");
     if (!ratingInput.isBlank()) {
       try {
         activity.setRating(Integer.parseInt(ratingInput.trim()));
@@ -654,7 +656,7 @@ public class UserInterface {
    * @param activity the activity to store the location on
    */
   private void readOptionalLocation(Activity activity) {
-    String locationInput = readLine("Location/starting point (empty to skip): ");
+    String locationInput = input.readLine("Location/starting point (empty to skip): ");
     if (!locationInput.isBlank()) {
       try {
         activity.setLocation(locationInput);
@@ -672,7 +674,7 @@ public class UserInterface {
     if (activity == null) {
       return;
     }
-    String confirmation = readNonBlankLine(
+    String confirmation = input.readNonBlankLine(
         "Delete \"" + activity.getTitle() + "\"? (y/n): ");
     if (confirmation.trim().equalsIgnoreCase("y")) {
       activityRegister.removeActivity(activity);
@@ -751,7 +753,7 @@ public class UserInterface {
     for (int i = 0; i < loggers.size(); i++) {
       System.out.println((i + 1) + ") " + loggers.get(i).getName());
     }
-    int choice = readInt("> ");
+    int choice = input.readInt("> ");
     if (choice < 1 || choice > loggers.size()) {
       System.out.println("Cancelled.");
       return null;
@@ -774,7 +776,7 @@ public class UserInterface {
     for (int i = 0; i < loggers.size(); i++) {
       System.out.println((i + 1) + ") " + loggers.get(i).getName());
     }
-    int choice = readInt("> ");
+    int choice = input.readInt("> ");
     if (choice == 0) {
       return createNewLogger();
     }
@@ -792,7 +794,7 @@ public class UserInterface {
    * @return the new logger, or {@code null} if the name was invalid
    */
   private Person createNewLogger() {
-    String name = readNonBlankLine("Name of the new logger: ");
+    String name = input.readNonBlankLine("Name of the new logger: ");
     Person person = new Person(name);
     personRegister.addPerson(person);
     System.out.println("Logger \"" + person.getName() + "\" was created.");
@@ -815,7 +817,7 @@ public class UserInterface {
     for (int i = 0; i < groups.size(); i++) {
       System.out.println((i + 1) + ") " + groups.get(i).getName());
     }
-    int choice = readInt("> ");
+    int choice = input.readInt("> ");
     if (choice < 1 || choice > groups.size()) {
       System.out.println("Cancelled.");
       return null;
@@ -844,7 +846,7 @@ public class UserInterface {
           + " (" + activity.getRegisteredAt().toLocalDate() + ", "
           + activity.getLogger().getName() + ")");
     }
-    int choice = readInt("> ");
+    int choice = input.readInt("> ");
     if (choice < 1 || choice > activities.size()) {
       System.out.println("Cancelled.");
       return null;
@@ -852,156 +854,4 @@ public class UserInterface {
     return activities.get(choice - 1);
   }
 
-  /**
-   * Reads an integer from the user, re-prompting until a valid integer is
-   * entered.
-   *
-   * @param prompt the prompt to print before reading
-   * @return the integer read from the user
-   */
-  private int readInt(String prompt) {
-    while (true) {
-      String line = readLine(prompt);
-      try {
-        return Integer.parseInt(line.trim());
-      } catch (NumberFormatException exception) {
-        System.out.println("Please enter a whole number.");
-      }
-    }
-  }
-
-  /**
-   * Reads a date from the user, re-prompting until a valid date in the
-   * ISO format yyyy-MM-dd is entered.
-   *
-   * @param prompt the prompt to print before reading
-   * @return the date read from the user
-   */
-  private LocalDate readDate(String prompt) {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    while (true) {
-      String line = readLine(prompt);
-      try {
-        return LocalDate.parse(line.trim(), formatter);
-      } catch (DateTimeParseException exception) {
-        System.out.println("Please enter a valid date in the format yyyy-MM-dd.");
-      }
-    }
-  }
-
-  /**
-   * Reads a time of day from the user, re-prompting until a valid time in the
-   * format HH:mm is entered.
-   *
-   * @param prompt the prompt to print before reading
-   * @return the time read from the user
-   */
-  private java.time.LocalTime readTime(String prompt) {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-    while (true) {
-      String line = readLine(prompt);
-      try {
-        return java.time.LocalTime.parse(line.trim(), formatter);
-      } catch (DateTimeParseException exception) {
-        System.out.println("Please enter a valid time in the format HH:mm.");
-      }
-    }
-  }
-
-  /**
-   * Reads a line of input from the user.
-   *
-   * @param prompt the prompt to print before reading
-   * @return the line read, without the trailing line separator
-   */
-  private String readLine(String prompt) {
-    System.out.print(prompt);
-    return scanner.nextLine();
-  }
-
-  /**
-   * Reads a line of input that must not be blank, re-prompting until a
-   * non-blank line is entered.
-   *
-   * @param prompt the prompt to print before reading
-   * @return the non-blank line read, trimmed
-   */
-  private String readNonBlankLine(String prompt) {
-    while (true) {
-      String line = readLine(prompt).trim();
-      if (!line.isEmpty()) {
-        return line;
-      }
-      System.out.println("The input must not be empty.");
-    }
-  }
-
-  /**
-   * Returns all allowed activity types.
-   *
-   * @return a list of the allowed activity type names
-   */
-  private List<String> allowedTypes() {
-    return List.of(Activity.TYPE_MOUNTAIN_HIKE, Activity.TYPE_GLACIER_HIKE,
-        Activity.TYPE_SUMMIT_TRIP);
-  }
-
-  /**
-   * Returns whether the given type is one of the allowed activity types,
-   * ignoring case.
-   *
-   * @param type the type to check
-   * @return {@code true} if the type is allowed
-   */
-  private boolean isAllowedType(String type) {
-    return allowedTypes().stream().anyMatch(allowed -> allowed.equalsIgnoreCase(type.trim()));
-  }
-
-  /**
-   * Fills the registers with demonstration data: three loggers, one group and
-   * four activities, of which one is private and two are shared.
-   */
-  private void createDemoData() {
-    Person alex = new Person("Alex");
-    Person nora = new Person("Nora");
-    Person jonas = new Person("Jonas");
-    personRegister.addPerson(alex);
-    personRegister.addPerson(nora);
-    personRegister.addPerson(jonas);
-
-    Group fjellgjengen = new Group("Fjellgjengen");
-    fjellgjengen.addMember(nora);
-    fjellgjengen.addMember(jonas);
-    groupRegister.addGroup(fjellgjengen);
-
-    Activity besseggen = new Activity(alex, Activity.TYPE_MOUNTAIN_HIKE, "Tur til Besseggen",
-        "Klassisk ryggtrase over Besseggen ved Gjende.", LocalDateTime.of(2026, 9, 12, 9, 30));
-    besseggen.setDurationMinutes(300);
-    besseggen.setDistanceKm(21.5);
-    besseggen.setRating(5);
-    besseggen.setLocation("Gjendesheim");
-
-    Activity gaustatoppen = new Activity(nora, Activity.TYPE_SUMMIT_TRIP,
-        "Gaustatoppen i solnedgang", "Kveldstur til Gaustatoppen, 1882 moh.",
-        LocalDateTime.of(2026, 10, 3, 17, 0));
-    gaustatoppen.setDurationMinutes(240);
-    gaustatoppen.setDistanceKm(12.0);
-    gaustatoppen.setRating(4);
-
-    Activity storronden = new Activity(jonas, Activity.TYPE_MOUNTAIN_HIKE, "Storronden runde",
-        "Rundtur i Rondane med pause ved Rondvassbu.", LocalDateTime.of(2026, 10, 18, 10, 15));
-
-    Activity morgenstund = new Activity(alex, Activity.TYPE_MOUNTAIN_HIKE,
-        "Morgenstund pa Vettakollen", "Kort morgenstur med utsikt over Oslofjorden.",
-        LocalDateTime.of(2026, 10, 25, 7, 45));
-    morgenstund.setDurationMinutes(90);
-
-    gaustatoppen.shareWith(fjellgjengen);
-    morgenstund.shareWith(nora);
-
-    activityRegister.addActivity(besseggen);
-    activityRegister.addActivity(gaustatoppen);
-    activityRegister.addActivity(storronden);
-    activityRegister.addActivity(morgenstund);
-  }
 }
