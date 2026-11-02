@@ -1,4 +1,4 @@
-package edu.ntnu.iir.bidata.fjelltur.model;
+package edu.ntnu.idi.bidata.fjelltur.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

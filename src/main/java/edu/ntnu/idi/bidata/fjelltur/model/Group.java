@@ -1,4 +1,4 @@
-package edu.ntnu.iir.bidata.fjelltur.model;
+package edu.ntnu.idi.bidata.fjelltur.model;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;

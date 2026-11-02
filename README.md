@@ -23,7 +23,7 @@ Fra kommandolinjen:
 ```bash
 mvn compile
 mvn test
-mvn exec:java -Dexec.mainClass="edu.ntnu.iir.bidata.fjelltur.App"
+mvn exec:java -Dexec.mainClass="edu.ntnu.idi.bidata.fjelltur.App"
 ```
 
 Eller åpne prosjektet i IntelliJ / VS Code og kjør `App.main()`.
@@ -31,7 +31,7 @@ Eller åpne prosjektet i IntelliJ / VS Code og kjør `App.main()`.
 ## Prosjektstruktur
 
 ```
-src/main/java/edu/ntnu/iir/bidata/fjelltur/
+src/main/java/edu/ntnu/idi/bidata/fjelltur/
 ├── App.java              # Applikasjonsklasse med main()
 ├── model/                # Entitetsklasser (Activity, Person, Group)
 ├── register/             # Registre med forretningslogikk

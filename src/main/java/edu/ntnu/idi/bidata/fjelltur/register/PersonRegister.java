@@ -1,6 +1,6 @@
-package edu.ntnu.iir.bidata.fjelltur.register;
+package edu.ntnu.idi.bidata.fjelltur.register;
 
-import edu.ntnu.iir.bidata.fjelltur.model.Person;
+import edu.ntnu.idi.bidata.fjelltur.model.Person;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

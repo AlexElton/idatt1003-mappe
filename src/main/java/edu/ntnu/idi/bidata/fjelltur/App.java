@@ -1,6 +1,6 @@
-package edu.ntnu.iir.bidata.fjelltur;
+package edu.ntnu.idi.bidata.fjelltur;
 
-import edu.ntnu.iir.bidata.fjelltur.ui.UserInterface;
+import edu.ntnu.idi.bidata.fjelltur.ui.UserInterface;
 
 /**
  * The application class of the Fjellturregister. Creates the user interface

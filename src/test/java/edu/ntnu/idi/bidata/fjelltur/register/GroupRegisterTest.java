@@ -1,12 +1,12 @@
-package edu.ntnu.iir.bidata.fjelltur.register;
+package edu.ntnu.idi.bidata.fjelltur.register;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.ntnu.iir.bidata.fjelltur.model.Group;
-import edu.ntnu.iir.bidata.fjelltur.model.Person;
+import edu.ntnu.idi.bidata.fjelltur.model.Group;
+import edu.ntnu.idi.bidata.fjelltur.model.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

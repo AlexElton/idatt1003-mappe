@@ -1,4 +1,4 @@
-package edu.ntnu.iir.bidata.fjelltur.model;
+package edu.ntnu.idi.bidata.fjelltur.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

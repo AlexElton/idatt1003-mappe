@@ -1,6 +1,6 @@
-package edu.ntnu.iir.bidata.fjelltur.register;
+package edu.ntnu.idi.bidata.fjelltur.register;
 
-import edu.ntnu.iir.bidata.fjelltur.model.Group;
+import edu.ntnu.idi.bidata.fjelltur.model.Group;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

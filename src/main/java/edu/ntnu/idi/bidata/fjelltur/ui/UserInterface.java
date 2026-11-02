@@ -1,12 +1,12 @@
-package edu.ntnu.iir.bidata.fjelltur.ui;
+package edu.ntnu.idi.bidata.fjelltur.ui;
 
-import edu.ntnu.iir.bidata.fjelltur.DemoDataSeeder;
-import edu.ntnu.iir.bidata.fjelltur.model.Activity;
-import edu.ntnu.iir.bidata.fjelltur.model.Group;
-import edu.ntnu.iir.bidata.fjelltur.model.Person;
-import edu.ntnu.iir.bidata.fjelltur.register.ActivityRegister;
-import edu.ntnu.iir.bidata.fjelltur.register.GroupRegister;
-import edu.ntnu.iir.bidata.fjelltur.register.PersonRegister;
+import edu.ntnu.idi.bidata.fjelltur.DemoDataSeeder;
+import edu.ntnu.idi.bidata.fjelltur.model.Activity;
+import edu.ntnu.idi.bidata.fjelltur.model.Group;
+import edu.ntnu.idi.bidata.fjelltur.model.Person;
+import edu.ntnu.idi.bidata.fjelltur.register.ActivityRegister;
+import edu.ntnu.idi.bidata.fjelltur.register.GroupRegister;
+import edu.ntnu.idi.bidata.fjelltur.register.PersonRegister;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
