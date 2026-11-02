@@ -1,14 +1,20 @@
 @startuml class-diagram
 skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam package {
+  BackgroundColor transparent
+  BorderColor transparent
+  FontStyle bold
+}
 
-package "edu.ntnu.iir.bidata.fjelltur" {
+package "fjelltur" {
   class App {
     - App()
     + {static} main(String[] args)
   }
 }
 
-package "edu.ntnu.iir.bidata.fjelltur.ui" {
+package "ui" {
   class UserInterface {
     - {static} MENU_* : int
     - scanner : Scanner
@@ -33,7 +39,7 @@ package "edu.ntnu.iir.bidata.fjelltur.ui" {
   }
 }
 
-package "edu.ntnu.iir.bidata.fjelltur.register" {
+package "register" {
   class ActivityRegister {
     - activities : List<Activity>
     + addActivity(Activity activity)
@@ -70,7 +76,7 @@ package "edu.ntnu.iir.bidata.fjelltur.register" {
   }
 }
 
-package "edu.ntnu.iir.bidata.fjelltur.model" {
+package "model" {
   class Activity {
     - {static} TYPE_MOUNTAIN_HIKE : String
     - {static} TYPE_GLACIER_HIKE : String
