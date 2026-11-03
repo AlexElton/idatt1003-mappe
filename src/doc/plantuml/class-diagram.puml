@@ -1,4 +1,6 @@
 @startuml class-diagram
+' Simplified overview: key fields and responsibilities only.
+' Getters/setters and menu constants are collapsed to keep the diagram readable.
 skinparam classAttributeIconSize 0
 skinparam packageStyle rectangle
 skinparam package {
@@ -6,36 +8,32 @@ skinparam package {
   BorderColor transparent
   FontStyle bold
 }
+skinparam linetype ortho
 
 package "fjelltur" {
   class App {
-    - App()
     + {static} main(String[] args)
   }
 }
 
 package "ui" {
   class UserInterface {
-    - {static} MENU_* : int
-    - scanner : Scanner
+    - input : InputReader
     - activityRegister : ActivityRegister
     - personRegister : PersonRegister
     - groupRegister : GroupRegister
     + init()
     + start()
-    - registerActivity()
-    - listActivities()
-    - searchMenu()
-    - deleteActivity()
-    - loggersMenu()
-    - groupsMenu()
-    - sharingMenu()
-    - showStatistics()
-    - readInt(String prompt) : int
-    - readDate(String prompt) : LocalDate
-    - readTime(String prompt) : LocalTime
-    - readLine(String prompt) : String
-    - readNonBlankLine(String prompt) : String
+    - ..menu handling..
+  }
+
+  class InputReader {
+    - scanner : Scanner
+    + readInt(String prompt) : int
+    + readDate(String prompt) : LocalDate
+    + readTime(String prompt) : LocalTime
+    + readLine(String prompt) : String
+    + readNonBlankLine(String prompt) : String
   }
 }
 
@@ -44,78 +42,45 @@ package "register" {
     - activities : List<Activity>
     + addActivity(Activity activity)
     + removeActivity(Activity activity) : boolean
-    + getAllActivitiesSortedByDate() : List<Activity>
-    + findActivitiesOnDate(LocalDate date) : List<Activity>
-    + findActivitiesInDateRange(LocalDate from, LocalDate to) : List<Activity>
-    + findActivitiesByLogger(Person logger) : List<Activity>
-    + findActivitiesByWord(String word) : List<Activity>
-    + findActivitiesByType(String type) : List<Activity>
-    + findActivitiesSharedWith(Person person) : List<Activity>
+    + findActivities..(6 search variants) : List<Activity>
     + getActivityCountPerLogger() : Map<Person, Long>
-    + getNumberOfActivities() : int
-    + getLastAddedActivity() : Optional<Activity>
+    + ..count and sort helpers..
   }
 
   class PersonRegister {
     - persons : List<Person>
     + addPerson(Person person) : boolean
-    + hasPerson(Person person) : boolean
     + findPersonByName(String name) : Optional<Person>
     + getAllPersonsSortedByName() : List<Person>
-    + getNumberOfPersons() : int
+    + ..hasPerson, count..
   }
 
   class GroupRegister {
     - groups : List<Group>
     + addGroup(Group group) : boolean
     + removeGroup(Group group) : boolean
-    + hasGroup(Group group) : boolean
     + findGroupByName(String name) : Optional<Group>
-    + getAllGroups() : List<Group>
-    + getNumberOfGroups() : int
+    + ..hasGroup, count..
   }
 }
 
 package "model" {
   class Activity {
-    - {static} TYPE_MOUNTAIN_HIKE : String
-    - {static} TYPE_GLACIER_HIKE : String
-    - {static} TYPE_SUMMIT_TRIP : String
+    - {static} TYPE_* : String
     - logger : Person
-    - type : String
-    - title : String
-    - description : String
+    - type, title, description : String
     - registeredAt : LocalDateTime
-    - durationMinutes : int
+    - durationMinutes, rating : int
     - distanceKm : double
-    - rating : int
     - location : String
     - isPrivate : boolean
     - sharedWith : List<Person>
     - sharedWithGroups : List<Group>
     + Activity(Person logger, String type, String title, String description, LocalDateTime registeredAt)
-    + getType() : String
-    + setType(String type)
-    + getTitle() : String
-    + setTitle(String title)
-    + getDescription() : String
-    + setDescription(String description)
-    + getLogger() : Person
-    + getRegisteredAt() : LocalDateTime
-    + getDurationMinutes() : int
-    + setDurationMinutes(int minutes)
-    + getDistanceKm() : double
-    + setDistanceKm(double km)
-    + getRating() : int
-    + setRating(int rating)
-    + getLocation() : String
-    + setLocation(String location)
-    + isPrivate() : boolean
+    + ..getters and setters..
     + shareWith(Person person)
     + shareWith(Group group)
     + makePrivate()
-    + getSharedWith() : List<Person>
-    + getSharedWithGroups() : List<Group>
   }
 
   class Person {
@@ -128,7 +93,6 @@ package "model" {
     - name : String
     - members : Set<Person>
     + Group(String name)
-    + getName() : String
     + addMember(Person person) : boolean
     + removeMember(Person person) : boolean
     + hasMember(Person person) : boolean
@@ -137,6 +101,7 @@ package "model" {
 }
 
 App ..> UserInterface : uses
+UserInterface --> InputReader : owns
 UserInterface --> ActivityRegister : owns
 UserInterface --> PersonRegister : owns
 UserInterface --> GroupRegister : owns

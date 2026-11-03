@@ -1,6 +1,7 @@
 @startuml sequence-register-activity
 actor Logger
 participant "UserInterface" as UI
+participant "InputReader" as IR
 participant "PersonRegister" as PR
 participant "ActivityRegister" as AR
 participant "Activity" as A
@@ -14,7 +15,8 @@ alt create new logger
   UI -> PR : addPerson(new Person(name))
 end
 UI --> Logger : prompt for type, title, description, date, time
-Logger -> UI : enter activity details
+Logger -> IR : readNonBlankLine / readDate / readTime
+IR --> UI : validated values
 UI -> A : new Activity(logger, type, title, description, timeOfHike)
 UI -> A : setDurationMinutes() / setDistanceKm() / setRating() / setLocation()
 UI -> AR : addActivity(activity)
