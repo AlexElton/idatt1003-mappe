@@ -1,24 +1,24 @@
 # Fjellturregister
 
-Tur- og aktivitetsregister for fjellturer — Mappeoppgave i IDATx1003 Programmering 1, høsten 2026.
+Hike and activity register for mountain trips — Portfolio assignment in IDATx1003 Programmering 1, autumn 2026.
 
-## Om prosjektet
+## About the project
 
-En tekstbasert, enkeltstående Java-applikasjon der brukere kan loggføre fjellturer,
-søke i dem, dele dem med andre loggførere eller grupper, og hente ut statistikk.
+A text-based, standalone Java application where users can log mountain hikes,
+search through them, share them with other loggers or groups, and view statistics.
 
-## Teknologier
+## Technologies
 
-| Verktøy      | Versjon  |
-|--------------|----------|
-| Java (LTS)   | 25       |
-| Maven        | 3.9.16   |
-| JUnit        | 6.1.3    |
-| CheckStyle   | Google-regler |
+| Tool        | Version       |
+|-------------|---------------|
+| Java (LTS)  | 25            |
+| Maven       | 3.9.16        |
+| JUnit       | 6.1.3         |
+| CheckStyle  | Google rules  |
 
-## Kjøring
+## Running
 
-Fra kommandolinjen:
+From the command line:
 
 ```bash
 mvn compile
@@ -26,21 +26,21 @@ mvn test
 mvn exec:java -Dexec.mainClass="edu.ntnu.idi.bidata.fjelltur.App"
 ```
 
-Eller åpne prosjektet i IntelliJ / VS Code og kjør `App.main()`.
+Or open the project in IntelliJ / VS Code and run `App.main()`.
 
-## Prosjektstruktur
+## Project structure
 
 ```
 src/main/java/edu/ntnu/idi/bidata/fjelltur/
-├── App.java              # Applikasjonsklasse med main()
-├── model/                # Entitetsklasser (Activity, Person, Group)
-├── register/             # Registre med forretningslogikk
-└── ui/                   # Tekstbasert brukergrensesnitt
-src/test/java/            # Enhetstester (positive og negative)
-docs/uml/                 # Genererte UML-diagrammer
+├── App.java              # Application class with main()
+├── model/                # Entity classes (Activity, Person, Group)
+├── register/             # Registers with business logic
+└── ui/                   # Text-based user interface
+src/test/java/            # Unit tests (positive and negative)
+docs/uml/                 # Generated UML diagrams
 ```
 
-## Versjonering
+## Versioning
 
-Prosjektet versjoneres med git. Release-versjoner merkes med tags som matcher
-versjonen i `pom.xml` (f.eks. `v1.0-SNAPSHOT` under utvikling).
+The project is versioned with git. Release versions are tagged to match the
+version in `pom.xml` (e.g. `v1.0-SNAPSHOT` during development).
